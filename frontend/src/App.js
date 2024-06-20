@@ -5,18 +5,35 @@ import './App.css';
 function App() {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState({ title: '', description: '', color: '#ffffff' });
+  const [editingTaskIndex, setEditingTaskIndex] = useState(null);
 
   const addTask = (e) => {
     e.preventDefault();
     if (newTask.title.trim() !== '' && newTask.description.trim() !== '') {
-      setTasks([...tasks, newTask]);
+      if (editingTaskIndex !== null) {
+        const updatedTasks = [...tasks];
+        updatedTasks[editingTaskIndex] = newTask;
+        setTasks(updatedTasks);
+        setEditingTaskIndex(null);
+      } else {
+        setTasks([...tasks, newTask]);
+      }
       setNewTask({ title: '', description: '', color: '#ffffff' });
     }
   };
 
   const deleteTask = (index) => {
+    if (editingTaskIndex === index) {
+      setEditingTaskIndex(null);
+      setNewTask({ title: '', description: '', color: '#ffffff' });
+    }
     const updatedTasks = tasks.filter((task, i) => i !== index);
     setTasks(updatedTasks);
+  };
+
+  const editTask = (index) => {
+    setNewTask(tasks[index]);
+    setEditingTaskIndex(index);
   };
 
   return (
@@ -39,11 +56,11 @@ function App() {
           value={newTask.color}
           onChange={(e) => setNewTask({ ...newTask, color: e.target.value })}
         />
-        <button type="submit">Añadir</button>
+        <button type="submit">{editingTaskIndex !== null ? 'Actualizar' : 'Añadir'}</button>
       </form>
       <ul>
         {tasks.map((task, index) => (
-          <ToDo key={index} task={task} deleteTask={() => deleteTask(index)} />
+          <ToDo key={index} task={task} editTask={() => editTask(index)} deleteTask={() => deleteTask(index)} />
         ))}
       </ul>
     </div>

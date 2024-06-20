@@ -8,11 +8,25 @@ form {
   margin-bottom: 20px;
 }
 
-input {
+input[type="text"],
+textarea {
   padding: 10px;
-  margin-right: 10px;
+  margin: 5px 10px 10px 0;
   border-radius: 5px;
   border: 1px solid #ccc;
+}
+
+input[type="color"] {
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  border: none;
+  margin: 5px 10px 10px 0;
+}
+
+textarea {
+  height: 60px;
+  resize: none;
 }
 
 button {
@@ -30,11 +44,28 @@ ul {
 
 li {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: flex-start;
   padding: 10px;
   border-bottom: 1px solid #ccc;
+  margin: 10px 0;
+  border-radius: 5px;
 }
 
 li button {
+  align-self: flex-end;
   background-color: #dc3545;
+  margin-top: 10px;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+}
+
+h3 {
+  margin: 0 0 5px 0;
+}
+
+p {
+  margin: 0;
 }

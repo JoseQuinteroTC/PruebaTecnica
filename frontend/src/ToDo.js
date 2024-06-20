@@ -1,15 +1,11 @@
-// src/ToDo.js
-import React from "react";
+import React from 'react';
 
 function ToDo({ task, deleteTask }) {
   return (
-    <li>
-      {task}
-      <div>
-        <button onClick={deleteTask}>Eliminar</button>
-        <button onClick={deleteTask}>Editar</button>
-        <button onClick={deleteTask}>Completado</button>
-      </div>
+    <li style={{ backgroundColor: task.color }}>
+      <h3>{task.title}</h3>
+      <p>{task.description}</p>
+      <button onClick={deleteTask}>Eliminar</button>
     </li>
   );
 }

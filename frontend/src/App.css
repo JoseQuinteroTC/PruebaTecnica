@@ -17,7 +17,7 @@ textarea {
   padding: 10px;
   margin: 5px 10px 10px 0;
   height: 30px;
-  width: 500px;
+  width: 50%;
   border-radius: 5px;
   border: 1px solid #ccc;
 }
@@ -40,6 +40,7 @@ button {
   border: none;
   background-color: #007bff;
   color: white;
+  width: 6rem;
 }
 
 ul {
@@ -74,4 +75,21 @@ h3 {
 
 p {
   margin: 0;
+}
+
+li.completed {
+  text-decoration: line-through;
+}
+
+.filter-buttons {
+  margin: 20px 0;
+}
+
+.filter-buttons button {
+  padding: 10px 15px;
+  margin: 0 5px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
 }

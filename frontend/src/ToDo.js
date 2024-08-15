@@ -1,16 +1,17 @@
 // src/ToDo.js
 import React from 'react';
 
-function ToDo({ task, deleteTask, editTask, toggleCompleted }) {
+function ToDo({ task, editTask, deleteTask, toggleCompleted }) {
   return (
-    <li style={{ backgroundColor: task.color, textDecoration: task.completed ? 'line-through' : 'none' }}>
+    <li className={`todo-item ${task.completed ? 'completed' : ''}`} style={{ backgroundColor: task.color }}>
       <h3>{task.title}</h3>
       <p>{task.description}</p>
-      <button onClick={editTask}>Editar</button>
-      <button onClick={deleteTask}>Eliminar</button>
-      <button onClick={toggleCompleted}>
-        {task.completed ? 'Desmarcar' : 'Completada'}
-      </button>
+      <button onClick={() => editTask(task)}>Editar</button>
+      <button onClick={() => deleteTask(task._id)}>Eliminar</button>
+      <button onClick={() => toggleCompleted(task._id)}>
+  {task.completed ? 'Completada' : 'Pendiente'}
+</button>
+
     </li>
   );
 }

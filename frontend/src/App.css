@@ -55,7 +55,7 @@ li {
   padding: 10px;
   border-bottom: 1px solid #ccc;
   margin: 10px 30px;
-  border-radius: 5px;
+  border-radius: 15px;
 }
 
 li button {
@@ -65,7 +65,7 @@ li button {
   color: white;
   border: none;
   padding: 5px 10px;
-  border-radius: 3px;
+  border-radius: 90px;
   height: 30px;
 }
 
@@ -93,3 +93,9 @@ li.completed {
   background-color: #007bff;
   color: white;
 }
+
+.completed {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+

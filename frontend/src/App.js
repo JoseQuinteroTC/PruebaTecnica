@@ -1,57 +1,122 @@
-import React, { useState } from 'react';
-import ToDo from './ToDo';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import ToDo from "./ToDo";
+import "./App.css";
+import axios from "axios";
 
 function App() {
   const [tasks, setTasks] = useState([]);
-  const [newTask, setNewTask] = useState({ title: '', description: '', color: '#ffffff', completed: false });
+  const [newTask, setNewTask] = useState({
+    title: "",
+    description: "",
+    color: "#ffffff",
+    completed: false,
+  });
   const [editingTaskIndex, setEditingTaskIndex] = useState(null);
-  const [filter, setFilter] = useState('all'); // Estado para el filtro
+  const [filter, setFilter] = useState("all"); // Estado para el filtro
 
+  useEffect(() => {
+    // Realiza una petición GET para obtener todas las tareas
+    axios
+      .get("http://localhost:5000/tasks")
+      .then((response) => {
+        setTasks(response.data);
+      })
+      .catch((error) => {
+        console.error("Hubo un error al obtener las tareas:", error);
+      });
+  }, []);
+
+  const editTask = (task) => {
+    setNewTask({
+      title: task.title,
+      description: task.description,
+      color: task.color,
+      completed: task.completed,
+    });
+    setEditingTaskIndex(task._id); // Guardar el ID de la tarea que se está editando
+  };
+
+  // Llamar a la función de editar cuando se envíe el formulario
   const addTask = (e) => {
     e.preventDefault();
-    if (newTask.title.trim() !== '' && newTask.description.trim() !== '') {
+    if (newTask.title.trim() !== "" && newTask.description.trim() !== "") {
       if (editingTaskIndex !== null) {
-        const updatedTasks = [...tasks];
-        updatedTasks[editingTaskIndex] = newTask;
-        setTasks(updatedTasks);
-        setEditingTaskIndex(null);
+        // Editar tarea existente
+        axios
+          .put(`http://localhost:5000/tasks/${editingTaskIndex}`, newTask)
+          .then((response) => {
+            const updatedTasks = tasks.map((task) =>
+              task._id === editingTaskIndex ? response.data : task
+            );
+            setTasks(updatedTasks);
+            setNewTask({
+              title: "",
+              description: "",
+              color: "#ffffff",
+              completed: false,
+            });
+            setEditingTaskIndex(null); // Restablecer el estado de edición
+          })
+          .catch((error) => {
+            console.error("Hubo un error al actualizar la tarea:", error);
+          });
       } else {
-        setTasks([...tasks, newTask]);
+        // Crear nueva tarea
+        axios
+          .post("http://localhost:5000/tasks", newTask)
+          .then((response) => {
+            setTasks([...tasks, response.data]);
+            setNewTask({
+              title: "",
+              description: "",
+              color: "#ffffff",
+              completed: false,
+            });
+          })
+          .catch((error) => {
+            console.error("Hubo un error al crear la tarea:", error);
+          });
       }
-      setNewTask({ title: '', description: '', color: '#ffffff', completed: false });
     }
   };
 
-  const deleteTask = (index) => {
-    if (editingTaskIndex === index) {
-      setEditingTaskIndex(null);
-      setNewTask({ title: '', description: '', color: '#ffffff', completed: false });
-    }
-    const updatedTasks = tasks.filter((task, i) => i !== index);
-    setTasks(updatedTasks);
+  const deleteTask = (taskId) => {
+    axios
+      .delete(`http://localhost:5000/tasks/${taskId}`)
+      .then((response) => {
+        // Filtra la tarea eliminada del estado actual
+        const updatedTasks = tasks.filter((task) => task._id !== taskId);
+        setTasks(updatedTasks);
+      })
+      .catch((error) => {
+        console.error("Hubo un error al eliminar la tarea:", error);
+      });
   };
 
-  const editTask = (index) => {
-    setNewTask(tasks[index]);
-    setEditingTaskIndex(index);
+  const toggleCompleted = (taskId) => {
+    axios.patch(`http://localhost:5000/tasks/${taskId}/toggle-completed`)
+      .then(response => {
+        const updatedTasks = tasks.map(task =>
+          task._id === taskId ? response.data : task
+        );
+        setTasks(updatedTasks);
+      })
+      .catch(error => {
+        console.error('Hubo un error al marcar la tarea como completada/pendiente:', error);
+      });
   };
+  
 
-  const toggleCompleted = (index) => {
-    const updatedTasks = [...tasks];
-    updatedTasks[index].completed = !updatedTasks[index].completed;
-    setTasks(updatedTasks);
-  };
-
-  const filteredTasks = tasks.filter(task => {
-    if (filter === 'completed') return task.completed;
-    if (filter === 'pending') return !task.completed;
+  const filteredTasks = tasks.filter((task) => {
+    if (filter === "completed") return task.completed;
+    if (filter === "pending") return !task.completed;
     return true;
   });
 
   return (
     <div className="App">
       <h1>To-Do List</h1>
+      
       <form onSubmit={addTask}>
         <input
           type="text"
@@ -61,7 +126,9 @@ function App() {
         />
         <textarea
           value={newTask.description}
-          onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+          onChange={(e) =>
+            setNewTask({ ...newTask, description: e.target.value })
+          }
           placeholder="Descripción de la tarea"
         />
         <input
@@ -69,23 +136,25 @@ function App() {
           value={newTask.color}
           onChange={(e) => setNewTask({ ...newTask, color: e.target.value })}
         />
-        <button type="submit">{editingTaskIndex !== null ? 'Actualizar' : 'Añadir'}</button>
+        <button type="submit">
+          {editingTaskIndex !== null ? "Guardar" : "Añadir"}
+        </button>
       </form>
 
       <div className="filter-buttons">
-        <button onClick={() => setFilter('all')}>Todas</button>
-        <button onClick={() => setFilter('pending')}>Pendientes</button>
-        <button onClick={() => setFilter('completed')}>Completadas</button>
+        <button onClick={() => setFilter("all")}>Todas</button>
+        <button onClick={() => setFilter("pending")}>Pendientes</button>
+        <button onClick={() => setFilter("completed")}>Completadas</button>
       </div>
 
       <ul>
         {filteredTasks.map((task, index) => (
           <ToDo
-            key={index}
+            key={task._id}
             task={task}
-            editTask={() => editTask(index)}
-            deleteTask={() => deleteTask(index)}
-            toggleCompleted={() => toggleCompleted(index)}
+            editTask={() => editTask(task)}
+            deleteTask={() => deleteTask(task._id)}
+            toggleCompleted={() => toggleCompleted(task._id)}
           />
         ))}
       </ul>
